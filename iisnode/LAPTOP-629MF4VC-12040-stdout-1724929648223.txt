@@ -1,0 +1,2 @@
+Server is running on \\.\pipe\fbb8230f-9601-4eed-a41e-e12cb530371c
+DB Connected

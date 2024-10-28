@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <%- include('../partials/HeaderFiles.ejs')%>
+    <style>
+        .error{
+            color: red;
+        }
+    </style>
+</head>
+<body onload="ReadTaxi()">
+<%- include('../partials/adminHeader.ejs')%>
+
+<div id="car-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Specifications</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-taxi" class="form-horizontal">
+                    <div class="contact-form-group">
+                        <input type="hidden" id="taxi_id">
+                        <div class="form-field">
+                            <label class="form-label" for="name"> Car Name</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter Name" class="form-control">
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="brand"> Car Brand</label>
+                            <input type="text" id="brand" name="brand" required placeholder="Enter Car Brand" class="form-control">
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="type"> Car Type</label>
+                            <select required class="form-control" name="type" id="type">
+                                <option value="">Please Select Car Type</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Coupe">Coupe</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="fuel">Fuel Type</label>
+                            <select required class="form-control" name="fuel" id="fuel">
+                                <option value="">Please Select Fuel Type</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="rent">Rent(without driver)</label>
+                            <input type="number" id="rent" name="rent" required placeholder="Enter Car Rent" class="form-control">
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="rentD">Rent(with driver)</label>
+                            <input type="text" id="rentD" name="rentD" required placeholder="Enter Car Rent" class="form-control">
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="color">Car Color</label>
+                            <input type="text" id="color" name="color" required placeholder="Enter Car Color" class="form-control">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="model">Model</label>
+                            <input type="text" id="model" name="model" required placeholder="Enter Car Model" class="form-control">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="regNo">Registered Car No.</label>
+                            <input type="text" id="regNo" name="regNo" required placeholder="Enter Registered Car No." class="form-control">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="seats">Seater</label>
+                            <input type="number" id="seats" name="seats" required placeholder="Enter Passenger Capacity" min="0" class="form-control">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="auto">Transmission</label>
+                            <select class="form-control" name="auto" id="auto">
+                                <option value="">Please Select Option</option>
+                                <option value="Manual">Manual</option>
+                                <option value="AutoMatic">AutoMatic</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="ac">Air Conditioner:</label><br>
+                            <label class="form-label" for="YES">Yes</label>
+                            <input type="radio" id="YES" name="ac" value="YES"   checked>
+                            <label for="NO">No</label>
+                            <input type="radio" id="NO" name="ac"  value="NO">
+                        </div>
+                        <div class="form-field message">
+                            <label for="desc">Description</label>
+                            <textarea type="text" name="desc" rows="3" id="desc" class="form-control" placeholder="Enter Car Description"></textarea>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" onclick="Update()" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="page-header">
+    <div class="page-header-shape"></div>
+    <div class="container">
+        <div class="page-header-info">
+            <h4>View Taxi</h4>
+            <h2>Our expert drivers will <br>make your <span>Ride Safe!</span></h2>
+            <p>Everything your taxi business <br>needs is already here! </p>
+        </div>
+    </div>
+</section>
+
+<section class="pricing-section bg-grey bd-bottom padding">
+    <div class="container">
+        <div class="section-heading text-center mb-40 wow fade-in-bottom" data-wow-delay="200ms">
+            <h4><span></span>Lets Go With Us!</h4>
+            <h2>Your Added Taxi's to Ride!</h2>
+            <p>We successfully cope with tasks of varying complexity, provide long-term <br>guarantees and regularly
+                master new technologies.</p>
+        </div>
+        <div class="tab-content" id="pricing-tab-content">
+            <div class="tab-pane fade show active" id="hybrid-taxi-content" role="tabpanel"
+                 aria-labelledby="hybrid-taxi-content">
+                <div id="Car-card" class="row">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<%- include('../partials/footer.ejs')%>
+<%- include('../partials/Scripts.ejs')%>
+
+<script>
+    async function ReadTaxi() {
+        let response = await fetch('/admin/read-taxi')
+        response = await response.json()
+       // console.log(response)
+        if (response.error !== "") {
+            Swal.fire({
+                icon: "error",
+                title: response.error,
+                showConfirmButton: true,
+            });
+        }
+        else {
+           let html =``
+            for (let x of response.record) {
+                html += `                    <div class="col-lg-4 col-md-6 sm-padding mb-3">
+                        <div class="pricing-item">
+                            <div class="pricing-head-wrap">
+                                <div class="pricing-car">
+                                    <img src="/assets/${x.image}" alt="car">
+                                </div>
+                            </div>
+                            <div class="pricing-head">
+                                <h3><a href="">${x.name} ${x.model}</a></h3>
+                            </div>
+                            <ul class="pricing-list">
+                                <li>Rental Charges: <span><i class="fa fa-rupee-sign">${x.rent}</i></span></li>
+                                <li>Rental Charges(with driver): <span><i class="fa fa-rupee-sign">${x.rent_driver}</i></span></li>
+                                <li>Fuel Type: <span>${x.fuel}</span></li>
+                                <li>Transmission: <span>${x.transmission} </span></li>
+                                <li>Passengers: <span>${x.seater} Person</span></li>
+                                <li><button style="width: 100%" onclick="UpdateTaxi(${x.car_id})" class="default-btn ">View/Update All Specification</button></li>
+                                <li><button style="width: 100%" onclick="DeleteTaxi(${x.car_id})" class="default-btn ">Delete</button></li>
+
+                            </ul>
+                        </div>
+                    </div>
+`
+
+                document.getElementById('Car-card').innerHTML = html ;
+            }
+        }
+
+    }
+
+    async function UpdateTaxi(id){
+        let response = await fetch('/admin/update-car/' + id)
+        response = await response.json()
+        //console.log(response)
+        if (response.error !== "") {
+            Swal.fire({
+                icon: "error",
+                title: response.error,
+                showConfirmButton: true,
+            });
+        }
+        else{
+            let y = response.record[0]
+            //console.log(y)
+            document.getElementById('taxi_id').value = y.car_id
+            document.getElementById('name').value = y.name
+            document.getElementById('brand').value = y.brand
+            document.getElementById('type').value = y.type
+            document.getElementById('desc').value = y.description
+            document.getElementById('fuel').value = y.fuel
+            document.getElementById('rent').value = y.rent
+            document.getElementById('rentD').value = y.rent_driver
+            document.getElementById('regNo').value = y.register_no
+            document.getElementById('seats').value = y.seater
+            document.getElementById('auto').value = y.transmission
+            document.getElementById('color').value = y.color
+            document.getElementById('model').value = y.model
+
+            let ac = y.ac
+            if(ac === "YES"){
+                document.getElementById('YES').checked = true
+            }else{
+                document.getElementById('NO').checked = true
+            }
+            //console.log(ac)
+            $("#car-modal").modal('show')
+        }
+    }
+
+    async function Update() {
+        let form = document.getElementById('update-taxi')
+        let formData = new FormData(form)
+        let car_id = document.getElementById('taxi_id').value
+        formData.append("car_id", car_id)
+
+        if ($("#update-taxi").valid()) {
+            let response = await fetch('/admin/update-taxi', {
+                method: 'POST',
+                body: formData
+            })
+            response = await response.json()
+            //console.log(response)
+            if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                });
+            } else {
+                Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: true,
+                }).then(() => {
+                    $("#car-modal").modal('hide')
+                    ReadTaxi()
+                })
+            }
+        }
+    }
+
+    async function DeleteTaxi(id) {
+        //console.log(id)
+        if (confirm('Are You Sure ?')) {
+            let response = await fetch('/admin/delete/' + id)
+            response = await response.json()
+            if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                });
+            } else {
+                Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: true,
+                }).then(() => {
+                    ReadTaxi()
+                })
+            }
+        }
+    }
+
+</script>
+
+</body>
+</html>

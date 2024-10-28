@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <%- include('../partials/HeaderFiles')%>
+
+    <style>
+        .error
+        {
+            color:red
+        }
+    </style>
+</head>
+<body>
+<%- include('../partials/header.ejs')%>
+
+<section class="page-header">
+    <div class="page-header-shape"></div>
+    <div class="container">
+        <div class="page-header-info">
+            <h4>Login Here</h4>
+            <h2>Our expert drivers will <br>make your <span>Ride Safe!</span></h2>
+            <p>Everything your taxi business <br>needs is already here! </p>
+        </div>
+    </div>
+</section>
+
+<section class="contact-section bd-bottom padding">
+    <div class="map"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-md-4">
+                <div class="contact-form">
+                    <form  id="loginForm" class="form-horizontal">
+                        <div class="contact-title">
+                            <h2>Login Here<span></span></h2>
+                        </div>
+                        <div class="taxi-booking-form">
+                            <div class="form-field">
+                                <label class="form-label" for="email">Enter Email</label>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <br>
+                            <div class="form-field">
+                                <label class="form-label" for="password">Enter Password</label>
+
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                            </div>
+                            <br>
+                            <div class="form-field">
+                                <button onclick="login()" class="default-btn" type="button">Login</button>
+                                <a href="/user/userForgotPassword" class="offset-md-5"><b>Forgot Password</b></a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<%- include('../partials/footer.ejs')%>
+<%- include('../partials/Scripts')%>
+<script>
+    async function login()
+    {
+        if($("#loginForm").valid()) {
+            let email = document.getElementById("email").value
+            let password = document.getElementById("password").value
+            let url = "/user/userLogin"
+            let response = await fetch(url,
+                {
+                    method: "Post",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({email: email, password: password})
+                })
+            response = await response.json()
+            if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                });
+            } else {
+                Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: true,
+                }).then(()=>{
+                    window.location.href='/user/userDashboard'
+                })
+            }
+        }
+    }
+</script>
+</body>
+</html>

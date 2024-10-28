@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <%- include('../partials/HeaderFiles') %>
+
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Car-Search-Modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Ride</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="book-form">
+                    <div class="taxi-booking-form">
+                        <input type="hidden" id="book_car_id">
+                        <div class="form-field">
+                            <i class="las la-user-tie"></i>
+                            <label for="full-name">Name</label>
+                            <input type="text" id="full-name" name="full-name" class="form-control"
+                                   placeholder="Your Name" required>
+                        </div>
+                        <div class="form-field">
+                            <i class="las la-envelope-open"></i>
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Email"
+                                   required>
+                        </div>
+                        <div class="form-field">
+                            <label for="startDate">Book From</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control"
+                                   placeholder="Select Date" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="endDate">Book To</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control"
+                                   placeholder="Select Date" required>
+                        </div>
+                        <div class="form-field">
+                            <i class="las la-phone"></i>
+                            <label for="phone">Mobile No.</label>
+                            <input type="tel" id="phone" name="phone" class="form-control "
+                                   placeholder="Enter Phone No." required>
+                        </div>
+                        <div class="form-field">
+                            <label for="rent">Book :</label>
+                            <div>
+                                <input checked type="radio" id="rent-with-driver" name="rent-option" value="withDriver">
+                                <label for="rent-with-driver">With Driver</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="rent-without-driver" name="rent-option" value="withoutDriver">
+                                <label for="rent-without-driver">Without Driver</label>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <button onclick="Proceed()" class="default-btn" type="button">Book Your Taxi</button>
+                            <button class="default-btn" type="button" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/userHeader.ejs') %>
+
+<section class="page-header">
+    <div class="page-header-shape"></div>
+    <div class="container">
+        <div class="page-header-info">
+            <h4>Book Taxi</h4>
+            <h2>Our expert drivers will <br>make your <span>Ride Safe!</span></h2>
+            <p>Everything your taxi business <br>needs is already here! </p>
+        </div>
+    </div>
+</section>
+
+<div class="taxi-booking bg-grey padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <form id="taxi-search">
+                    <div class="taxi-booking-form">
+
+                        <div class="form-field">
+                            <label class="form-label" for="type">Select Car Type</label>
+                            <select required class="form-control" name="type" id="type">
+                                <option value="">Please Select Car Type</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Coupe">Coupe</option>
+                            </select>
+                        </div>
+                        <div class="form-field"></div>
+
+                        <div class="form-field">
+                            <label for="startedDate">Book From</label>
+                            <input type="date" id="startedDate" name="startDate" class="form-control"
+                                   placeholder="Select Date" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="endedDate">Book To</label>
+                            <input type="date" id="endedDate" name="endDate" class="form-control"
+                                   placeholder="Select Date" required>
+                        </div>
+
+                        <div class="form-field">
+                            <button type="button" class="default-btn" onclick="ReadTaxi()">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="CARS" style="display: none" class="pricing-section bg-grey bd-bottom padding">
+    <div class="container">
+        <div class="section-heading text-center mb-40 wow fade-in-bottom" data-wow-delay="200ms">
+            <h4><span></span>Lets Go With Us!</h4>
+            <h2>Your Taxi's to Ride!</h2>
+            <p>We successfully cope with tasks of varying complexity, provide long-term <br>guarantees and regularly
+                master new technologies.</p>
+        </div>
+        <div class="tab-content" id="pricing-tab-content">
+            <div class="tab-pane fade show active" id="hybrid-taxi-content" role="tabpanel"
+                 aria-labelledby="hybrid-taxi-content">
+                <div id="Car-card" class="row">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<%- include('../partials/footer.ejs') %>
+<%- include('../partials/Scripts') %>
+<script>
+    let CarData;
+    async function ReadTaxi() {
+        let form = document.getElementById('taxi-search')
+        let formData = new FormData(form)
+        if($("#taxi-search").valid()) {
+            let start = document.getElementById('startedDate').value
+            let end = document.getElementById('endedDate').value
+            localStorage.setItem('Start-Date', start)
+            localStorage.setItem('End-Date', end)
+            //console.log(type)
+            let response = await fetch('/user/read-search-taxi', {
+                method: 'POST',
+                body: formData
+            })
+            response = await response.json()
+            // console.log(response)
+            if (response.error === 'Unauthorized Access') {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                }).then(() => {
+                    window.location.href = "/user/userLogin"
+                })
+            } else if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                });
+            } else {
+                if (response.record.length === 0) {
+                    return Swal.fire({
+                        icon: "error",
+                        title: 'Not Available',
+                        showConfirmButton: true,
+                    });
+                }
+                CarData = response.record
+                let html = ``
+                for (let x of response.record) {
+                    html += `                <div class="col-lg-4 col-md-6 sm-padding mb-3">
+                        <div class="pricing-item">
+                            <div class="pricing-head-wrap">
+                                <div class="pricing-car">
+                                    <img src="/assets/${x.image}" alt="car">
+                                </div>
+                            </div>
+                            <div class="pricing-head">
+                                <h3><a href="">${x.name} ${x.model}</a></h3>
+                            </div>
+                            <ul class="pricing-list">
+                                <li>Rental Charges: <span><i class="fa fa-rupee-sign">${x.rent}</i></span></li>
+                                <li>Rental Charges(with driver): <span><i class="fa fa-rupee-sign">${x.rent_driver}</i></span></li>
+                                <li>Fuel Type: <span>${x.fuel}</span></li>
+                                <li>Transmission: <span>${x.transmission} </span></li>
+                                <li>Passengers: <span>${x.seater} Person</span></li>
+                                <li><button style="width: 100%" onclick="BookModal(${x.car_id})" class="default-btn ">Book Now</button></li>
+                            </ul>
+                        </div>
+                    </div>`
+                    document.getElementById('Car-card').innerHTML = html;
+                    document.getElementById('CARS').style.display = 'block';
+                }
+            }
+        }
+    }
+
+    let CarId
+
+    async function BookModal(id) {
+        let response = await fetch('/user/user-data')
+        response = await response.json()
+        //console.log(response)
+        if (response.error === 'Unauthorized Access') {
+            Swal.fire({
+                icon: "error",
+                title: response.error,
+                showConfirmButton: true,
+            }).then(() => {
+                window.location.href = "/user/userLogin"
+            })
+        } else if (response.error !== "") {
+            Swal.fire({
+                icon: "error",
+                title: response.error,
+                showConfirmButton: true,
+            });
+        } else {
+         // console.log(localStorage.getItem('Start-Date'))
+            let x = response.record[0]
+            document.getElementById('full-name').value = x.name
+            document.getElementById('email').value = x.email
+            document.getElementById('email').disabled = true
+            document.getElementById('phone').value = x.phone
+            document.getElementById('book_car_id').value = id
+            document.getElementById('startDate').value = localStorage.getItem('Start-Date')
+            document.getElementById('endDate').value = localStorage.getItem('End-Date')
+            document.getElementById('startDate').disabled = true
+            document.getElementById('endDate').disabled = true
+            $("#Car-Search-Modal").modal('show')
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let today = new Date();
+        let day = String(today.getDate()).padStart(2, '0');
+        let month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0
+        let year = today.getFullYear();
+        let currentDate = year + '-' + month + '-' + day;
+
+        // Set the min attribute of the check-in date to today's date
+        let checkinInput = document.getElementById('startedDate');
+        checkinInput.setAttribute('min', currentDate);
+
+        // Set the min attribute of the check-out date based on the selected check-in date
+        checkinInput.addEventListener('change', function () {
+            let checkinDate = this.value;
+            let checkoutInput = document.getElementById('endedDate');
+            checkoutInput.setAttribute('min', checkinDate);
+        });
+    });
+
+    async function Proceed() {
+        if ($("#book-form").valid()) {
+            let id = document.getElementById('book_car_id').value;
+            let response = await fetch('/user/read-searched-taxi/' + id);
+            response = await response.json();
+
+            if (response.error === 'Unauthorized Access') {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                }).then(() => {
+                    window.location.href = "/user/userLogin";
+                });
+            } else if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                });
+            } else {
+                //console.log(response.record);
+                CarId = response.record
+                const bookCarId = document.getElementById('book_car_id').value;
+                const fullName = document.getElementById('full-name').value;
+                const email = document.getElementById('email').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const phone = document.getElementById('phone').value;
+                const rentOption = document.querySelector('input[name="rent-option"]:checked').value;
+
+                //console.log(rentOption);
+                let checkin = new Date(startDate);
+                let checkout = new Date(endDate);
+                let diffTime = Math.abs(checkout - checkin);
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                let pricePerNight = rentOption === "withoutDriver" ? response.record[0].rent : response.record[0].rent_driver;
+                let totalAmount = pricePerNight * diffDays;
+
+                let options = {
+                    key: "rzp_test_dRWiKHS7zr2Gki", // Replace with your Razorpay API key
+                    amount: totalAmount * 100, // Amount is in paisa
+                    name: "Air Bnb",
+                    description: "Booking Payment",
+                    image: "/images/logo.png", // URL of your company logo
+                    handler: function (response) {
+                        RazorPayResponse(response);
+                    },
+                    theme: {
+                        color: "White",
+                    },
+                };
+
+                let rzp1 = new Razorpay(options);
+                rzp1.open();
+            }
+        }
+    }
+
+    const RazorPayResponse = async (response) => {
+        if (response.razorpay_payment_id !== "") {
+            // Capture form values again
+            const bookCarId = document.getElementById('book_car_id').value;
+            const fullName = document.getElementById('full-name').value;
+            const email = document.getElementById('email').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const phone = document.getElementById('phone').value;
+            const rentOption = document.querySelector('input[name="rent-option"]:checked').value;
+            // console.log(CarId[0].rent)
+            // console.log(CarId[0].rent_driver)
+
+            let checkin = new Date(startDate);
+            let checkout = new Date(endDate);
+            let diffTime = Math.abs(checkout - checkin);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            let pricePerNight = rentOption === "withoutDriver" ? CarId[0].rent : CarId[0].rent_driver;
+            let totalAmount = pricePerNight * diffDays;
+            //console.log(pricePerNight)
+            // Call Paid function with all details
+            Paid(response.razorpay_payment_id, bookCarId, startDate, endDate, totalAmount, diffDays, fullName, email, phone, rentOption);
+        }
+    };
+
+    async function Paid(paymentId, bookCarId, startDate, endDate, totalAmount, diffDays, fullName, email, phone, rentOption) {
+        //console.log("Payment ID:", paymentId);
+        //console.log("Book Car ID:", bookCarId);
+        //console.log("Booked From:", startDate);
+        //console.log("Booked To:", endDate);
+        //console.log("Total Amount:", totalAmount);
+        //console.log("Days", diffDays);
+
+        let response = await fetch('/user/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                paymentId: paymentId,
+                startDate: startDate,
+                endDate: endDate,
+                totalAmount: totalAmount,
+                bookCarId: bookCarId,
+                days: diffDays,
+                fullName: fullName,
+                email: email,
+                phone: phone,
+                booked: rentOption
+            })
+        });
+
+        response = await response.json();
+
+        if (response.error !== "") {
+            Swal.fire({
+                icon: "error",
+                title: response.error,
+                showConfirmButton: true,
+            });
+        } else {
+            Swal.fire({
+                icon: "success",
+                title: response.message,
+                showConfirmButton: true,
+            }).then(() => {
+                document.getElementById('book-form').reset()
+                $("#Car-Search-Modal").modal('hide')
+                window.location.href="/user/My-Bookings"
+            });
+        }
+    }
+
+
+</script>
+</body>
+</html>

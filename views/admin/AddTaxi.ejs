@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <%- include('../partials/HeaderFiles.ejs')%>
+    <style>
+        .error{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<%- include('../partials/adminHeader.ejs')%>
+
+<section class="page-header">
+    <div class="page-header-shape"></div>
+    <div class="container">
+        <div class="page-header-info">
+            <h4>Taxi</h4>
+            <h2>Our expert drivers will <br>make your <span>Ride Safe!</span></h2>
+            <p>Everything your taxi business <br>needs is already here! </p>
+        </div>
+    </div>
+</section>
+
+<section class="contact-section bd-bottom padding">
+    <div class="map"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-md-3">
+                <div class="contact-form">
+                    <form id="add-taxi" class="form-horizontal">
+                        <div class="contact-title">
+                            <h2>Add Taxi<span></span></h2>
+                        </div>
+                        <div class="contact-form-group">
+                            <div class="form-field">
+                                <label class="form-label" for="name">Enter Car Name</label>
+                                <input type="text" id="name" name="name" required placeholder="Enter Name" class="form-control">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="brand">Enter Car Brand</label>
+                                <input type="text" id="brand" name="brand" required placeholder="Enter Car Brand" class="form-control">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="type"> Car Type</label>
+                                <select required class="form-control" name="type" id="type">
+                                    <option value="">Please Select Car Type</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Sedan">Sedan</option>
+                                    <option value="Hatchback">Hatchback</option>
+                                    <option value="Coupe">Coupe</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="fuel">Fuel Type</label>
+                                <select required class="form-control" name="fuel" id="fuel">
+                                    <option value="">Please Select Fuel Type</option>
+                                    <option value="Petrol">Petrol</option>
+                                    <option value="Diesel">Diesel</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="rent">Rent(without driver)</label>
+                                <input type="number" id="rent" name="rent" required placeholder="Enter Car Rent" class="form-control">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="rentD">Rent(with driver)</label>
+                                <input type="text" id="rentD" name="rentD" required placeholder="Enter Car Rent" class="form-control">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="color">Car Color</label>
+                                <input type="text" id="color" name="color" required placeholder="Enter Car Color" class="form-control">
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="model">Model</label>
+                                <input type="text" id="model" name="model" required placeholder="Enter Car Model" class="form-control">
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="regNo">Registered Car No.</label>
+                                <input type="text" id="regNo" name="regNo" required placeholder="Enter Registered Car No." class="form-control">
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="seats">Seater</label>
+                                <input type="number" id="seats" name="seats" required placeholder="Enter Passenger Capacity" min="0" class="form-control">
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="auto">Transmission</label>
+                                <select class="form-control" name="auto" id="auto">
+                                    <option value="">Please Select Option</option>
+                                    <option value="Manual">Manual</option>
+                                    <option value="AutoMatic">AutoMatic</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label for="ac">Air Conditioner:</label><br>
+                                <label class="form-label" for="YES">Yes</label>
+                                <input type="radio" id="YES" name="ac" value="YES"   checked>
+                                <label for="NO">No</label>
+                                <input type="radio" id="NO" name="ac"  value="NO">
+                            </div>
+                            <div class="form-field message">
+                                <label for="desc">Description</label>
+                                <textarea type="text" name="desc" rows="3" id="desc" class="form-control" placeholder="Enter Car Description"></textarea>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="image">Image</label>
+                                <input type="file" name="image" id="image" class="form-control">
+                            </div>
+
+
+                        </div>
+                        <button onclick="AddTaxi()" class="default-btn mt-3" type="button">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('../partials/footer.ejs')%>
+<%- include('../partials/Scripts.ejs')%>
+
+<script>
+    async function AddTaxi() {
+        let form = document.getElementById('add-taxi');
+        let formData = new FormData(form);
+
+        if ($("#add-taxi").valid()) {
+            let response = await fetch('/admin/add-taxi', {
+                method: 'POST',
+                body: formData
+            });
+
+            response = await response.json();
+            //console.log(response);
+            if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: true,
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: true,
+                }).then(()=>{
+                    document.getElementById('add-taxi').reset()
+                })
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

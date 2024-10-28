@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+   <%-include('../partials/HeaderFiles')%>
+<style>
+    .error
+    {
+        color:red
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row pt-5">
+        <div class="col-sm-6 offset-lg-3" style="background-color:lightcyan">
+            <form class="m-4" id="loginForm">
+                <h2 style="color: saddlebrown;text-align: center">Login</h2>
+                <label for="email">Enter Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter Email" class="form-control">
+                <br>
+                <label for="password">Enter Password</label>
+                <input type="password" id="password" name="password" required minlength="3" maxlength="8" placeholder="Enter Password" class="form-control">
+                <button type="button" onclick="login()" class="btn btn-primary form-control mt-4 mb-3">Login</button>
+                <a href="/admin/adminForgotPassword" style="text-align: left;" ><b>Forgot Password</b></a>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<%-include('../partials/Scripts')%>
+
+<script>
+    async function login()
+    {
+        if($("#loginForm").valid()) {
+            let email = document.getElementById("email").value
+            let password = document.getElementById("password").value
+            let url = "/admin/adminLogin"
+            let response = await fetch(url,
+                {
+                    method: "Post",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({email: email, password: password})
+                })
+            response = await response.json()
+            if (response.error !== "") {
+                Swal.fire({
+                    icon: "error",
+                    title: response.error,
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: true,
+                }).then(()=>{
+                    window.location.href='/admin/adminDashboard'
+                })
+            }
+        }
+    }
+</script>
+</body>
+</html>

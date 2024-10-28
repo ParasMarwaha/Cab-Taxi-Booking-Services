@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="//cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
+    <%- include('../partials/HeaderFiles')%>
+
+</head>
+<style>
+    .error
+    {
+        color:red
+    }
+
+</style>
+<body onload="ReadBooking()">
+
+<div id="DetailModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer Personal Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="signupform" >
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="name">Full Name</label>
+                                <input type="text" name="name" id="name" required class="form-control" placeholder="Enter Your Name">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" id="email" required class="form-control" placeholder="Enter Your Email">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="address">Address'</label>
+                                <textarea type="text" name="address" id="address" required placeholder="Enter Your Address" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="phone">Mobile No.</label>
+                                <input type="tel" maxlength="10" name="phone" id="phone" required class="form-control" placeholder="Enter Your Contact Number">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/adminHeader')%>
+
+<section class="page-header">
+    <div class="page-header-shape"></div>
+    <div class="container">
+        <div class="page-header-info">
+            <h4>Bookings</h4>
+            <h2>Our expert drivers will <br>make your <span>Ride Safe!</span></h2>
+            <p>Everything your taxi business <br>needs is already here! </p>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+
+    <table id="AllbookedDetails" class="table table-bordered table-dark table-hover">
+        <thead>
+        <tr>
+            <th>Sr No.</th>
+            <th>Booked By</th>
+            <th>Taxi Name</th>
+            <th>Taxi Type</th>
+            <th>Booked From</th>
+            <th>Booked To</th>
+            <th>Days</th>
+            <th>Amount Paid</th>
+            <th>User Details</th>
+        </tr>
+        </thead>
+        <tbody id="AllBooK">
+
+        </tbody>
+    </table>
+
+</div>
+
+
+<%- include('../partials/footer')%>
+<%- include('../partials/Scripts')%>
+<script>
+    async function ReadBooking(){
+
+        let response = await fetch('/admin/All-User-Bookings')
+        response = await response.json()
+        // console.log(response)
+        if (response.error !== "") {
+            // console.log(response.error)
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: (response.error),
+            });
+        }
+        else {
+            //console.log(response.record)
+            let html = ``;
+            for (let i = 0; i < response.record.length; i++) {
+                let records = response.record[i];
+                //console.log(records)
+                html += `<tr >
+                         <td class="text-center">${i + 1}</td>
+                         <td class="text-center">${records.UserName}</td>
+                         <td class="text-center">${records.name}</td>
+                         <td class="text-center">${records.type}</td>
+<td class="text-center">${records.startDate.split("T")[0]}</td>
+                         <td class="text-center">${records.endDate.split("T")[0]}</td>
+                         <td class="text-center">${records.days}</td>
+                         <td class="text-center">${records.amount}</td>
+                         <td class="text-center"><button onclick="Details(${records.user_id})" type="button" class=" btn-sm btn btn-primary">Details</button></td>`
+            }
+
+            document.getElementById('AllBooK').innerHTML = html;
+            let table = new DataTable('#AllbookedDetails');
+        }
+    }
+
+    async function Details(id){
+        //console.log(id)
+        let response = await fetch('/admin/user-desc/'+id)
+        response = await response.json()
+        //console.log(response)
+        if (response.error !== "") {
+            // console.log(response.error)
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: (response.error),
+            })
+        }
+        else {
+            document.getElementById('name').value = response.record[0].name
+            document.getElementById('email').value = response.record[0].email
+            document.getElementById('address').value = response.record[0].address
+            document.getElementById('phone').value = response.record[0].phone
+            document.getElementById('name').disabled = true
+            document.getElementById('email').disabled = true
+            document.getElementById('address').disabled = true
+            document.getElementById('phone').disabled = true
+        }
+
+        $("#DetailModal").modal('show')
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="//cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
+    <%- include('../partials/HeaderFiles')%>
+
+</head>
+<style>
+    .error
+    {
+        color:red
+    }
+
+</style>
+<body onload="ReadBooking()">
+<%- include('../partials/userHeader')%>
+
+<section class="page-header">
+    <div class="page-header-shape"></div>
+    <div class="container">
+        <div class="page-header-info">
+            <h4>Bookings</h4>
+            <h2>Our expert drivers will <br>make your <span>Ride Safe!</span></h2>
+            <p>Everything your taxi business <br>needs is already here! </p>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+
+    <table id="bookedDetails" class="table table-bordered table-dark table-hover">
+        <thead>
+        <tr>
+            <th class="text-center">Sr No.</th>
+            <th class="text-center">Taxi Name</th>
+            <th class="text-center">Taxi Type</th>
+            <th class="text-center">Booked From</th>
+            <th class="text-center">Booked To</th>
+            <th class="text-center">Days</th>
+            <th class="text-center">Amount Paid</th>
+        </tr>
+        </thead>
+        <tbody id="booked">
+
+        </tbody>
+    </table>
+
+</div>
+
+
+<%- include('../partials/footer')%>
+<%- include('../partials/Scripts')%>
+<script>
+    async function ReadBooking(){
+
+        let response = await fetch('/user/user-Bookings')
+        response = await response.json()
+       // console.log(response)
+        if (response.error !== "") {
+            // console.log(response.error)
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: (response.error),
+            });
+        }
+        else {
+            //console.log(response.record)
+            let html = ``;
+            for (let i = 0; i < response.record.length; i++) {
+                let records = response.record[i];
+                //console.log(records)
+                html += `<tr >
+                         <td class="text-center">${i + 1}</td>
+                         <td class="text-center">${records.name}</td>
+                         <td class="text-center">${records.type}</td>
+<td class="text-center">${records.startDate.split("T")[0]}</td>
+                         <td class="text-center">${records.endDate.split("T")[0]}</td>
+                         <td class="text-center">${records.days}</td>
+                         <td class="text-center">${records.amount}</td>`
+            }
+
+            document.getElementById('booked').innerHTML = html;
+            let table = new DataTable('#bookedDetails');
+        }
+    }
+</script>
+</body>
+</html>
